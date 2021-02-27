@@ -1,0 +1,45 @@
+/*
+ * @lc app=leetcode.cn id=230 lang=javascript
+ *
+ * [230] 二叉搜索树中第K小的元素
+ */
+
+// @lc code=start
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @param {number} k
+ * @return {number}
+ */
+var kthSmallest = function(root, k) {
+  if (!root) return null;
+
+  let rank = 0;
+  let result = 0;
+
+  function recurse(root, k) {
+    if (!root) return;
+
+    recurse(root.left, k);
+
+    if (++rank === k) {
+      result = root.val;
+      return;
+    }
+
+    recurse(root.right, k);
+  }
+
+  recurse(root, k);
+
+  return result;
+};
+// @lc code=end
+
