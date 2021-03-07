@@ -30,6 +30,9 @@ var maxSlidingWindow = function (nums, k) {
   return result;
 };
 
+/**
+ * 创建单调递减队列
+ */
 function createDecQueue() {
   const data = [];
 
