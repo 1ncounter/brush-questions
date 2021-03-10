@@ -11,11 +11,9 @@
  * @return {number}
  */
 var maxResult = function (nums, k) {
-  const dp = [];
-
   // 设置一个单调递减队列
   const queue = [];
-
+  const dp = [];
   dp[0] = nums[0];
 
   for (let i = 0; i < nums.length; i++) {
