@@ -35,7 +35,7 @@ class Heap<T> {
     while (i > 0) {
       par = Math.floor((i - 1) / 2);
 
-      if (this.compareFunc(data[par], t) < 0) break;
+      if (this.compareFunc(t, data[par]) > 0) break;
 
       data[i] = data[par];
       i = par;
