@@ -18,8 +18,8 @@
  * @return {ListNode}
  */
 var detectCycle = function (head) {
-  let fast, slow;
-  fast = slow = head;
+  let fast = head;
+  let slow = head;
 
   while (fast != null && fast.next != null) {
     fast = fast.next.next;
