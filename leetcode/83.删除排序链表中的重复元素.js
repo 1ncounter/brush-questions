@@ -17,23 +17,41 @@
  * @return {ListNode}
  */
 var deleteDuplicates = function (head) {
-  if (!head) return null;
+  // 新链表
+  let dummy = new ListNode(null);
+  let tail = dummy;
 
-  let slow = head;
-  let fast = head.next;
-
-  while (fast) {
-    if (slow.val !== fast.val) {
-      slow.next = fast;
-      slow = slow.next;
+  while (head) {
+    if (head.val !== tail.val) {
+      tail.next = head;
+      tail = tail.next;
     }
 
-    fast = fast.next;
+    head = head.next;
   }
 
-  // 断开与后面重复元素的连接
-  slow.next = null;
+  tail.next = null;
 
-  return head;
+  return dummy.next;
+
+  // 快慢指针
+  // if (!head) return null;
+
+  // let slow = head;
+  // let fast = head.next;
+
+  // while (fast) {
+  //   if (slow.val !== fast.val) {
+  //     slow.next = fast;
+  //     slow = slow.next;
+  //   }
+
+  //   fast = fast.next;
+  // }
+
+  // // 断开与后面重复元素的连接
+  // slow.next = null;
+
+  // return head;
 };
 // @lc code=end
