@@ -4,7 +4,7 @@
   "description": "leetcode and more",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "ts-node index.ts"
   },
   "repository": {
     "type": "git",
@@ -18,6 +18,11 @@
   },
   "homepage": "https://github.com/1ncounter/brush-questions#readme",
   "dependencies": {
+    "accounting": "^0.4.1",
     "ramda": "^0.27.1"
+  },
+  "devDependencies": {
+    "@types/ramda": "^0.27.39",
+    "ts-node": "^9.1.1"
   }
 }
