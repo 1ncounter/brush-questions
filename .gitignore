@@ -2,3 +2,7 @@
 .idea
 node_modules
 
+# npm 安装文件
+package.json
+package-lock.json
+tsconfig.json
