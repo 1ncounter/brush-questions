@@ -18,7 +18,7 @@
  * @param {number} key
  * @return {TreeNode}
  */
-var deleteNode = function(root, key) {
+var deleteNode = function (root, key) {
   if (!root) return null;
 
   if (root.val == key) {
@@ -32,11 +32,11 @@ var deleteNode = function(root, key) {
     root.val = minNode.val;
     root.right = deleteNode(root.right, minNode.val);
   } else if (root.val > key) {
-      // 去左子树找
-      root.left = deleteNode(root.left, key);
+    // 去左子树找
+    root.left = deleteNode(root.left, key);
   } else if (root.val < key) {
-      // 去右子树找
-      root.right = deleteNode(root.right, key);
+    // 去右子树找
+    root.right = deleteNode(root.right, key);
   }
 
   return root;
@@ -48,4 +48,3 @@ function getMin(node) {
   return node;
 }
 // @lc code=end
-
