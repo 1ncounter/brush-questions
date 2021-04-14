@@ -14,8 +14,9 @@ var combine = function (n, k) {
   if (n === 0) return [];
 
   const result = [];
+  const path = [];
 
-  function backtrack(path, begin) {
+  function backtrack(begin) {
     if (path.length === k) {
       result.push([...path]);
       return;
@@ -25,12 +26,12 @@ var combine = function (n, k) {
       if (path.includes(i)) continue;
 
       path.push(i);
-      backtrack(path, i + 1);
+      backtrack(i + 1);
       path.pop();
     }
   }
 
-  backtrack([], 1);
+  backtrack(1);
 
   return result;
 };

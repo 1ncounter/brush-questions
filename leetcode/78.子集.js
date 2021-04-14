@@ -12,21 +12,23 @@
 var subsets = function (nums) {
   if (nums.length === 0) return [];
 
-  const result = [];
+  const ans = [];
+  const path = [];
 
-  function backtrack(track, start) {
-    result.push([...track]);
-    if (track.length === nums.length) return;
+  function backtrack(nums, start, path, ans) {
+    if (start > nums.length) return;
+
+    ans.push([...path]);
 
     for (let i = start; i < nums.length; i++) {
-      track.push(nums[i]);
-      backtrack(track, i + 1);
-      track.pop();
+      path.push(nums[i]);
+      backtrack(nums, i + 1, path, ans);
+      path.pop();
     }
   }
 
-  backtrack([], 0);
+  backtrack(nums, 0, path, ans);
 
-  return result;
+  return ans;
 };
 // @lc code=end

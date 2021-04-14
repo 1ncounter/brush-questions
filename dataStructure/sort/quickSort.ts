@@ -36,31 +36,30 @@ function swap(nums: number[], n1: number, n2: number) {
 function quickSort2(nums: number[]) {
   if (!nums || nums.length === 0) return;
 
-  qSort2(nums, 0, nums.length - 1);
+  qSort2(nums, 0, nums.length);
 }
 
 export function qSort2(nums: number[], lo: number, hi: number) {
-  if (lo > hi || nums.length <= 1) return;
+  if (lo >= hi || nums.length <= 1) return;
 
-  const p = partition2(nums, lo, hi);
+  const p = partition(nums, lo, hi);
 
-  qSort2(nums, lo, p - 1);
+  qSort2(nums, lo, p);
   qSort2(nums, p + 1, hi);
 }
 
-function partition2(nums: number[], lo: number, hi: number) {
+function partition(nums: number[], lo: number, hi: number) {
   if (lo >= hi) return lo;
   // 将 nums[lo] 作为默认分界点 pivot
   let pivot = nums[lo];
   let i = lo;
-  let j = hi + 1;
+  let j = hi;
 
   while (true) {
     // 保证 nums[lo..i] 都小于 pivot
     while (nums[++i] < pivot) {
       if (i == hi) break;
     }
-
     // 保证 nums[j..hi] 都大于 pivot
     while (nums[--j] > pivot) {
       if (j == lo) break;
