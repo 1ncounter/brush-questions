@@ -1,33 +1,53 @@
 /**
  * 最大并发数 / JS限流调度器
  */
-class Scheduler {
-  private queue: Array<() => Promise<void>> = [];
-  private count: number = 0;
+function random() {
+  return Math.floor(Math.random() * 1500) + 500;
+}
 
-  constructor(private cap: number = 2) {}
+function delay(i) {
+  return () =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve(i), random());
+    });
+}
 
-  async add(func: () => Promise<void>): Promise<void> {
-    const wrapper = this.runWrapper(func);
+function concurrentReq(list, limit) {
+  if (list.length === 0) return [];
 
-    if (this.count >= 2) {
-      this.queue.unshift(wrapper);
-    } else {
-      this.count++;
-      wrapper();
+  const fns = list.map((i) => delay(i));
+
+  let activeCount = 0;
+  const result = [];
+  const queue = [];
+
+  return new Promise((resolve) => {
+    function runWrapper(fn, idx) {
+      return async () => {
+        activeCount++;
+        const res = await fn();
+        result[idx] = res;
+
+        if (result.length === list.length) {
+          resolve(result);
+        }
+
+        activeCount--;
+        if (queue.length > 0) {
+          const fn = queue.pop();
+          fn();
+        }
+      };
     }
-  }
 
-  runWrapper(func: () => Promise<void>) {
-    return async () => {
-      await func();
+    for (let i = 0; i < fns.length; i++) {
+      const fn = runWrapper(fns[i], i);
 
-      if (this.queue.length > 0) {
-        const nextFunc = this.queue.pop();
-        nextFunc();
+      if (activeCount >= limit) {
+        queue.unshift(fn);
       } else {
-        this.count--;
+        fn();
       }
-    };
-  }
+    }
+  });
 }

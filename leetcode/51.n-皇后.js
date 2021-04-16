@@ -9,16 +9,17 @@
  * @param {number} n
  * @return {string[][]}
  */
-const queen = 'Q';
-const empty = '.';
-
 var solveNQueens = function (n) {
   if (n === 0) return [];
 
+  const queen = 'Q';
+  const empty = '.';
   const result = [];
 
   // 初始化棋盘
-  const board = new Array(n).fill(empty).map((item) => new Array(n).fill(empty));
+  const board = new Array(n)
+    .fill(empty)
+    .map((item) => new Array(n).fill(empty));
 
   function backtrack(board, row) {
     if (row === n) {

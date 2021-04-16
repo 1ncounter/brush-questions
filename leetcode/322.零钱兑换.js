@@ -11,41 +11,43 @@
  * @return {number}
  */
 var coinChange = function (coins, amount) {
-  // const dpTable = {};
+  if (amount === 0) return 0;
 
-  // function dp(n) {
-  //   if (dpTable[n]) return dpTable[n];
+  const dpTable = {};
 
-  //   if (n === 0) return 0;
-  //   if (n < 0) return -1;
+  const dfs = (need) => {
+    if (dpTable[need]) return dpTable[need];
 
-  //   let res = Infinity;
+    let ans = Infinity;
 
+    for (const coin of coins) {
+      if (need === coin) return 1;
+
+      if (need > coin) {
+        ans = Math.min(ans, dfs(need - coin));
+      }
+    }
+
+    dpTable[need] = ans;
+
+    return ans;
+  };
+
+  let ans = dfs(amount);
+
+  return ans === Infinity ? -1 : ans;
+
+  // const dp = new Array(amount + 1).fill(amount + 1);
+  // dp[0] = 0;
+
+  // for (let i = 0; i <= amount; i++) {
   //   for (const coin of coins) {
-  //     const subproblem = dp(n - coin);
-  //     if (subproblem === -1) continue;
-  //     res = Math.min(res, subproblem + 1);
+  //     if (i - coin < 0) continue;
+
+  //     dp[i] = Math.min(dp[i], 1 + dp[i - coin]);
   //   }
-
-  //   res = res === Infinity ? -1 : res;
-  //   dpTable[n] = res;
-
-  //   return res;
   // }
 
-  // return dp(amount);
-
-  const dp = new Array(amount + 1).fill(amount + 1);
-  dp[0] = 0;
-
-  for (let i = 0; i <= amount; i++) {
-    for (const coin of coins) {
-      if (i - coin < 0) continue;
-
-      dp[i] = Math.min(dp[i], 1 + dp[i - coin]);
-    }
-  }
-
-  return dp[amount] === amount + 1 ? -1 : dp[amount];
+  // return dp[amount] === amount + 1 ? -1 : dp[amount];
 };
 // @lc code=end
