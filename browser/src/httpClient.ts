@@ -1,9 +1,10 @@
 import { createConnection, Socket } from 'net';
 import { EventEmitter } from 'events';
 import { STATUS_CODES } from 'http';
-import { URL } from 'url';
+import { RequestBuilder } from './requestBuilder';
+import { ResponseParser } from './responseParser';
 
-interface Headers {
+export interface Headers {
   [name: string]: string | number;
 }
 
@@ -25,7 +26,7 @@ export class HTTPRequest extends EventEmitter {
   _readyState: HTTPRequestState = HTTPRequestState.UNSENT;
 
   connection: Socket = null;
-  requestOptsBuilder: RequestOptsBuilder;
+  requestBuilder: RequestBuilder;
   responseParser: ResponseParser;
 
   status: number = 200;
@@ -55,7 +56,7 @@ export class HTTPRequest extends EventEmitter {
   constructor() {
     super();
 
-    this.requestOptsBuilder = new RequestOptsBuilder();
+    this.requestBuilder = new RequestBuilder();
     this.responseParser = new ResponseParser();
   }
 
@@ -64,10 +65,10 @@ export class HTTPRequest extends EventEmitter {
   }
 
   setRequestHeader(name: string, content: string) {
-    this.requestOptsBuilder.header(name, content);
+    this.requestBuilder.header(name, content);
   }
   overrideMimeType(mimeType: string) {
-    this.requestOptsBuilder.header('Content-Type', mimeType);
+    this.requestBuilder.header('Content-Type', mimeType);
   }
 
   getResponseHeader(name: string) {
@@ -78,7 +79,7 @@ export class HTTPRequest extends EventEmitter {
   }
 
   writeSocket(body?: Record<string, any>) {
-    const { url, writeTemplate } = this.requestOptsBuilder.body(body).build();
+    const { url, writeTemplate } = this.requestBuilder.body(body).build();
 
     if (this.connection) {
       this.connection.write(writeTemplate);
@@ -95,11 +96,16 @@ export class HTTPRequest extends EventEmitter {
     }
 
     this.connection.on('data', (data) => {
-      const result = data.toString();
-      this.connection.end();
-    });
+      this.responseParser.receive(data.toString('utf-8'));
 
-    this.connection.on('end', () => {
+      if (this.responseParser.finished) {
+        this.status = this.responseParser.statusCode;
+        this.responseText = decodeURIComponent(this.responseParser.content);
+        this.responseHeaders = this.responseParser.headers;
+      }
+
+      this.connection.end();
+
       this.emit('load');
     });
 
@@ -109,8 +115,8 @@ export class HTTPRequest extends EventEmitter {
   }
 
   open(method: string, url: string) {
-    this.requestOptsBuilder.reset();
-    this.requestOptsBuilder.method(method).url(url);
+    this.requestBuilder.reset();
+    this.requestBuilder.method(method).url(url);
   }
 
   send(body?: Record<string, any>) {
@@ -119,90 +125,3 @@ export class HTTPRequest extends EventEmitter {
 
   abort() {}
 }
-
-class RequestOptsBuilder {
-  _method = 'GET';
-  _url: string = '';
-  _headers: Headers = {};
-  _body: Record<string, any> = {};
-
-  constructor() {
-    this.reset();
-  }
-
-  reset() {
-    this._method = 'GET';
-    this._url = '';
-    this._headers = {
-      ['Content-Type']: 'application/x-www-form-unlencoded',
-    };
-    this._body = {};
-  }
-  build() {
-    const url = this.parseUrl();
-    const body = this.parseBody();
-    const headers = this.parseHeader();
-
-    const writeTemplate = `${this._method.toUpperCase()} / HTTP/1.1\r
-${Object.entries(headers)
-  .map(([key, value]) => `${key}: ${value}`)
-  .join('\r\n')}\r\n
-${body}\r
-`;
-
-    return {
-      url,
-      writeTemplate,
-    };
-  }
-
-  method(method: string) {
-    this._method = method;
-    return this;
-  }
-  url(url: string) {
-    this._url = url;
-    return this;
-  }
-  header(name: string, content: string) {
-    this._headers[name] = content;
-    return this;
-  }
-  body(body: Record<string, any>) {
-    if (body) this._body = body;
-    return this;
-  }
-
-  private parseUrl() {
-    const url = new URL(this._url);
-    return url;
-  }
-  private parseHeader() {
-    const headers = {};
-    console.log(this._headers);
-    Object.keys(this._headers).forEach((key) => {
-      let value = this._headers[key];
-      headers[key] = value;
-    });
-
-    return headers;
-  }
-  private parseBody() {
-    let bodyText = '';
-    const ContentType = this._headers['Content-Type'];
-
-    if (ContentType === 'application/json') {
-      bodyText = JSON.stringify(this._body);
-    } else if (ContentType === 'application/x-www-form-unlencoded') {
-      bodyText = Object.keys(this._body)
-        .map((key) => `${key}=${encodeURIComponent(this._body[key])}`)
-        .join('&');
-    }
-
-    this._headers['Content-Length'] = bodyText.length;
-
-    return bodyText;
-  }
-}
-
-class ResponseParser {}

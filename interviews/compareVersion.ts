@@ -15,7 +15,13 @@ function createVersion(version: string) {
   };
 }
 
-function diffVersion(v1: string, v2: string) {
+/**
+ * 对比版本号
+ * compareVersion( '4.0.1.0' , '=', '0.4.1.0' )  // false
+ * compareVersion( '4.0.1.0' ,'>', '4')    // true
+ * compareVersion( '4.0.1.0' ,'<', '4.1.0' )   // true
+ */
+function compareVersion(v1: string, operator: string, v2: string) {
   const version1 = createVersion(v1);
   const version2 = createVersion(v2);
 
